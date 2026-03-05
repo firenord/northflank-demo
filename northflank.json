@@ -20,8 +20,7 @@
           "kind": "Project",
           "ref": "project",
           "spec": {
-            "name": "Test",
-            "color": "#57637A",
+            "name": "${args.PROJECT_NAME}",
             "networking": {
               "tailscale": {
                 "authKeyTags": [],

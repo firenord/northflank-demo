@@ -1,0 +1,108 @@
+{
+  "$schema": "https://api.northflank.com/v1/schemas/template",
+  "apiVersion": "v1.2",
+  "name": "northflank-demo",
+  "description": "Build and run the northflank-demo app",
+  "arguments": {
+    "PROJECT_NAME": "Northflank Demo",
+    "PROJECT_REGION": "us-east",
+    "SERVICE_NAME": "web",
+    "SERVICE_INSTANCES": "1",
+    "DEPLOYMENT_PLAN": "nf-compute-20",
+    "BUILD_PLAN": "nf-compute-400-16",
+    "GIT_ACCOUNT": "",
+    "GIT_REPO": "",
+    "GIT_BRANCH": "main",
+    "MESSAGE": "Hello World!"
+  },
+  "options": {
+    "autorun": false,
+    "concurrencyPolicy": "allow"
+  },
+  "spec": {
+    "kind": "Workflow",
+    "spec": {
+      "type": "sequential",
+      "steps": [
+        {
+          "kind": "Project",
+          "ref": "project",
+          "spec": {
+            "name": "${args.PROJECT_NAME}",
+            "region": "${args.PROJECT_REGION}",
+            "networking": {
+              "allowedIngressProjects": []
+            }
+          }
+        },
+        {
+          "kind": "Workflow",
+          "spec": {
+            "type": "sequential",
+            "context": {
+              "projectId": "${refs.project.id}"
+            },
+            "steps": [
+              {
+                "kind": "CombinedService",
+                "ref": "app",
+                "spec": {
+                  "name": "${args.SERVICE_NAME}",
+                  "billing": {
+                    "deploymentPlan": "${args.DEPLOYMENT_PLAN}",
+                    "buildPlan": "${args.BUILD_PLAN}"
+                  },
+                  "deployment": {
+                    "instances": "${args.SERVICE_INSTANCES}",
+                    "docker": {
+                      "configType": "default"
+                    }
+                  },
+                  "runtimeEnvironment": {
+                    "MESSAGE": "${args.MESSAGE}"
+                  },
+                  "runtimeFiles": {},
+                  "buildArguments": {},
+                  "buildFiles": {},
+                  "vcsData": {
+                    "projectType": "github",
+                    "accountLogin": "${args.GIT_ACCOUNT}",
+                    "projectUrl": "${args.GIT_REPO}",
+                    "projectBranch": "${args.GIT_BRANCH}"
+                  },
+                  "ports": [
+                    {
+                      "name": "web",
+                      "internalPort": 3000,
+                      "protocol": "HTTP",
+                      "public": true,
+                      "security": {
+                        "policies": [],
+                        "credentials": []
+                      },
+                      "disableNfDomain": false
+                    }
+                  ],
+                  "buildSettings": {
+                    "dockerfile": {
+                      "buildEngine": "kaniko",
+                      "useCache": false,
+                      "dockerWorkDir": "/",
+                      "dockerFilePath": "/Dockerfile"
+                    }
+                  },
+                  "disabledCI": false,
+                  "buildConfiguration": {
+                    "pathIgnoreRules": [],
+                    "isAllowList": false,
+                    "ciIgnoreFlagsEnabled": false
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

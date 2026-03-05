@@ -1,11 +1,8 @@
 {
   "apiVersion": "v1.2",
-  "name": "hello-world",
-  "description": "Build and run the app",
   "arguments": {
     "PROJECT_NAME": "hello-world",
     "PROJECT_REGION": "us-central",
-    "SERVICE_NAME": "web",
     "SERVICE_INSTANCES": "1",
     "DEPLOYMENT_PLAN": "nf-compute-20",
     "BUILD_PLAN": "nf-compute-400-16",
@@ -13,10 +10,6 @@
     "GIT_REPO": "",
     "GIT_BRANCH": "main",
     "MESSAGE": "Hello World!"
-  },
-  "options": {
-    "autorun": false,
-    "concurrencyPolicy": "queue"
   },
   "spec": {
     "kind": "Workflow",
@@ -46,7 +39,7 @@
                 "kind": "CombinedService",
                 "ref": "app",
                 "spec": {
-                  "name": "${args.SERVICE_NAME}",
+                  "name": "web",
                   "billing": {
                     "deploymentPlan": "${args.DEPLOYMENT_PLAN}",
                     "buildPlan": "${args.BUILD_PLAN}"
@@ -92,7 +85,8 @@
                     "pathIgnoreRules": [],
                     "isAllowList": false,
                     "ciIgnoreFlagsEnabled": false
-                  }
+                  },
+                  "buildArguments": {}
                 }
               }
             ]

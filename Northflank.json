@@ -42,7 +42,6 @@
                   },
                   "vcsData": {
                     "projectType": "github",
-                    "accountLogin": "${args.GIT_ACCOUNT}",
                     "projectUrl": "${args.GIT_REPO}",
                     "projectBranch": "${args.GIT_BRANCH}"
                   },
@@ -82,8 +81,6 @@
       ]
     }
   },
-  "name": "test",
-  "description": "Build and run the northflank-demo app",
   "options": {
     "autorun": false,
     "concurrencyPolicy": "allow"

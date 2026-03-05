@@ -5,8 +5,7 @@
     "SERVICE_INSTANCES": "1",
     "DEPLOYMENT_PLAN": "nf-compute-20",
     "BUILD_PLAN": "nf-compute-400-16",
-    "GIT_ACCOUNT": "",
-    "GIT_REPO": "",
+    "GIT_REPO": "https://github.com/firenord/northflank-demo.git",
     "GIT_BRANCH": "main",
     "MESSAGE": "Hello World!"
   },

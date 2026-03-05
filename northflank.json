@@ -1,8 +1,10 @@
 {
   "apiVersion": "v1.2",
+  "name": "hello-world",
+  "description": "Build and run the app",
   "arguments": {
-    "PROJECT_NAME": "Northflank Demo",
-    "PROJECT_REGION": "us-east",
+    "PROJECT_NAME": "hello-world",
+    "PROJECT_REGION": "us-central",
     "SERVICE_NAME": "web",
     "SERVICE_INSTANCES": "1",
     "DEPLOYMENT_PLAN": "nf-compute-20",
@@ -11,6 +13,10 @@
     "GIT_REPO": "",
     "GIT_BRANCH": "main",
     "MESSAGE": "Hello World!"
+  },
+  "options": {
+    "autorun": false,
+    "concurrencyPolicy": "queue"
   },
   "spec": {
     "kind": "Workflow",
@@ -21,7 +27,7 @@
           "kind": "Project",
           "ref": "project",
           "spec": {
-            "name": "${args.PROJECT_NAME}",
+            "name": "Test",
             "region": "${args.PROJECT_REGION}",
             "networking": {
               "allowedIngressProjects": []
@@ -54,9 +60,6 @@
                   "runtimeEnvironment": {
                     "MESSAGE": "${args.MESSAGE}"
                   },
-                  "runtimeFiles": {},
-                  "buildArguments": {},
-                  "buildFiles": {},
                   "vcsData": {
                     "projectType": "github",
                     "accountLogin": "${args.GIT_ACCOUNT}",

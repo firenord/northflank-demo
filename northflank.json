@@ -1,8 +1,7 @@
 {
   "apiVersion": "v1.2",
   "arguments": {
-    "PROJECT_NAME": "hello-world",
-    "PROJECT_REGION": "us-central",
+    "PROJECT_ID": "test",
     "SERVICE_INSTANCES": "1",
     "DEPLOYMENT_PLAN": "nf-compute-20",
     "BUILD_PLAN": "nf-compute-400-16",
@@ -17,26 +16,11 @@
       "type": "sequential",
       "steps": [
         {
-          "kind": "Project",
-          "ref": "project",
-          "spec": {
-            "name": "${args.PROJECT_NAME}",
-            "networking": {
-              "tailscale": {
-                "authKeyTags": [],
-                "enabled": false
-              },
-              "allowedIngressProjects": []
-            },
-            "region": "us-central"
-          }
-        },
-        {
           "kind": "Workflow",
           "spec": {
             "type": "sequential",
             "context": {
-              "projectId": "${refs.project.id}"
+              "projectId": "${args.PROJECT_ID}"
             },
             "steps": [
               {
@@ -108,7 +92,7 @@
     "vcsService": "github",
     "accountLogin": "firenord",
     "branch": "main",
-    "filePath": "/northflank.json"
+    "filePath": "/Northflank.json"
   },
   "$schema": "https://api.northflank.com/v1/schemas/template"
 }

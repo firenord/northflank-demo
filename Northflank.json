@@ -1,0 +1,99 @@
+{
+  "apiVersion": "v1.2",
+  "arguments": {
+    "PROJECT_ID": "test",
+    "SERVICE_INSTANCES": "1",
+    "DEPLOYMENT_PLAN": "nf-compute-20",
+    "BUILD_PLAN": "nf-compute-400-16",
+    "GIT_REPO": "https://github.com/firenord/northflank-demo.git",
+    "GIT_BRANCH": "main",
+    "MESSAGE": "Hello World!"
+  },
+  "spec": {
+    "kind": "Workflow",
+    "spec": {
+      "type": "sequential",
+      "steps": [
+        {
+          "kind": "Workflow",
+          "spec": {
+            "type": "sequential",
+            "context": {
+              "projectId": "${args.PROJECT_ID}"
+            },
+            "steps": [
+              {
+                "kind": "CombinedService",
+                "ref": "app",
+                "spec": {
+                  "name": "web",
+                  "billing": {
+                    "deploymentPlan": "${args.DEPLOYMENT_PLAN}",
+                    "buildPlan": "${args.BUILD_PLAN}"
+                  },
+                  "deployment": {
+                    "instances": "${args.SERVICE_INSTANCES}",
+                    "docker": {
+                      "configType": "default"
+                    }
+                  },
+                  "runtimeEnvironment": {
+                    "MESSAGE": "${args.MESSAGE}"
+                  },
+                  "vcsData": {
+                    "projectType": "github",
+                    "accountLogin": "${args.GIT_ACCOUNT}",
+                    "projectUrl": "${args.GIT_REPO}",
+                    "projectBranch": "${args.GIT_BRANCH}"
+                  },
+                  "ports": [
+                    {
+                      "name": "web",
+                      "internalPort": 3000,
+                      "protocol": "HTTP",
+                      "public": true,
+                      "security": {
+                        "policies": [],
+                        "credentials": []
+                      },
+                      "disableNfDomain": false
+                    }
+                  ],
+                  "buildSettings": {
+                    "dockerfile": {
+                      "buildEngine": "kaniko",
+                      "useCache": false,
+                      "dockerWorkDir": "/",
+                      "dockerFilePath": "/Dockerfile"
+                    }
+                  },
+                  "disabledCI": false,
+                  "buildConfiguration": {
+                    "pathIgnoreRules": [],
+                    "isAllowList": false,
+                    "ciIgnoreFlagsEnabled": false
+                  },
+                  "buildArguments": {}
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "name": "test",
+  "description": "Build and run the northflank-demo app",
+  "options": {
+    "autorun": false,
+    "concurrencyPolicy": "allow"
+  },
+  "gitops": {
+    "repoUrl": "https://github.com/firenord/northflank-demo",
+    "vcsService": "github",
+    "accountLogin": "firenord",
+    "branch": "main",
+    "filePath": "/Northflank.json"
+  },
+  "$schema": "https://api.northflank.com/v1/schemas/template"
+}

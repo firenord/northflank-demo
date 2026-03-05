@@ -1,8 +1,5 @@
 {
-  "$schema": "https://api.northflank.com/v1/schemas/template",
   "apiVersion": "v1.2",
-  "name": "northflank-demo",
-  "description": "Build and run the northflank-demo app",
   "arguments": {
     "PROJECT_NAME": "Northflank Demo",
     "PROJECT_REGION": "us-east",
@@ -14,10 +11,6 @@
     "GIT_REPO": "",
     "GIT_BRANCH": "main",
     "MESSAGE": "Hello World!"
-  },
-  "options": {
-    "autorun": false,
-    "concurrencyPolicy": "allow"
   },
   "spec": {
     "kind": "Workflow",
@@ -104,5 +97,17 @@
         }
       ]
     }
-  }
+  },
+  "options": {
+    "autorun": false,
+    "concurrencyPolicy": "allow"
+  },
+  "gitops": {
+    "repoUrl": "https://github.com/firenord/northflank-demo",
+    "vcsService": "github",
+    "accountLogin": "firenord",
+    "branch": "main",
+    "filePath": "/northflank.json"
+  },
+  "$schema": "https://api.northflank.com/v1/schemas/template"
 }

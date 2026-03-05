@@ -21,10 +21,15 @@
           "ref": "project",
           "spec": {
             "name": "Test",
-            "region": "${args.PROJECT_REGION}",
+            "color": "#57637A",
             "networking": {
+              "tailscale": {
+                "authKeyTags": [],
+                "enabled": false
+              },
               "allowedIngressProjects": []
-            }
+            },
+            "region": "us-central"
           }
         },
         {

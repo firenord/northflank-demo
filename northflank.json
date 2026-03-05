@@ -42,7 +42,6 @@
                   },
                   "vcsData": {
                     "projectType": "github",
-                    "accountLogin": "${args.GIT_ACCOUNT}",
                     "projectUrl": "${args.GIT_REPO}",
                     "projectBranch": "${args.GIT_BRANCH}"
                   },

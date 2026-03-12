@@ -55,7 +55,8 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64, linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Deploy to Northflank
@@ -65,5 +66,5 @@ jobs:
           northflank-api-key: ${{ secrets.NF_TOKEN }}
           project-id: "test"
           service-id: "plain-night"
-          image-path: ${{ steps.meta.outputs.tags }}
+          image-path: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           credentials-id: "github"

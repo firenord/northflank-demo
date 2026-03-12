@@ -37,12 +37,29 @@ jobs:
             --query 'taskDefinition' \
             --output json > task-def.json
 
+      - name: Resolve container name
+        id: container
+        run: |
+          set -euo pipefail
+          desired="${{ env.ECS_CONTAINER_NAME }}"
+          names="$(jq -r '.containerDefinitions[].name' task-def.json)"
+          if [ -n "${desired}" ] && echo "${names}" | grep -Fxq "${desired}"; then
+            echo "name=${desired}" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+          first="$(echo "${names}" | head -n1)"
+          if [ -z "${first}" ]; then
+            echo "No container definitions found in task definition." >&2
+            exit 1
+          fi
+          echo "name=${first}" >> "${GITHUB_OUTPUT}"
+
       - name: Render task definition with new image
         id: render-td
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-def.json
-          container-name: ${{ env.ECS_CONTAINER_NAME }}
+          container-name: ${{ steps.container.outputs.name }}
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.event.workflow_run.head_sha }}
 
       - name: Deploy to ECS

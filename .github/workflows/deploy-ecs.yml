@@ -37,6 +37,22 @@ jobs:
             --query 'taskDefinition' \
             --output json > task-def.json
 
+      - name: Sanitize task definition for registration
+        run: |
+          set -euo pipefail
+          jq 'del(
+                .taskDefinitionArn,
+                .revision,
+                .status,
+                .requiresAttributes,
+                .compatibilities,
+                .registeredAt,
+                .registeredBy,
+                .containerDefinitions[].restartPolicy,
+                .containerDefinitions[].versionConsistency
+              )' task-def.json > task-def.sanitized.json
+          mv task-def.sanitized.json task-def.json
+
       - name: Resolve container name
         id: container
         run: |

@@ -59,12 +59,61 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Ensure Northflank deployment service exists
+        id: ensure-service
+        if: github.event_name != 'pull_request'
+        env:
+          NORTHFLANK_API_KEY: ${{ secrets.NF_TOKEN }}
+        run: |
+          set -euo pipefail
+          API="https://api.northflank.com"
+          PROJECT_ID="${{ env.NF_PROJECT_ID }}"
+          SERVICE_NAME="${{ env.NF_SERVICE_NAME }}"
+          DEPLOYMENT_PLAN="${{ env.NF_DEPLOYMENT_PLAN }}"
+
+          services="$(curl -fsSL -H "Authorization: Bearer ${NORTHFLANK_API_KEY}" "${API}/v1/projects/${PROJECT_ID}/services")"
+          service_id="$(echo "${services}" | jq -r --arg name "${SERVICE_NAME}" '.data.services[] | select(.name==$name) | .id' | head -n1)"
+          service_type="$(echo "${services}" | jq -r --arg id "${service_id}" '.data.services[] | select(.id==$id) | .serviceType' || true)"
+
+          if [ -z "${service_id}" ] || [ "${service_id}" = "null" ]; then
+            payload="$(jq -n \
+              --arg name "${SERVICE_NAME}" \
+              --arg plan "${DEPLOYMENT_PLAN}" \
+              '{
+                name: $name,
+                billing: { deploymentPlan: $plan },
+                deployment: { instances: 1, docker: { configType: "default" } },
+                ports: [
+                  {
+                    name: "web",
+                    internalPort: 3000,
+                    public: true,
+                    protocol: "HTTP",
+                    security: { policies: [], credentials: [] },
+                    disableNfDomain: false
+                  }
+                ]
+              }')"
+
+            created="$(curl -fsSL -H "Authorization: Bearer ${NORTHFLANK_API_KEY}" -H "Content-Type: application/json" \
+              -d "${payload}" "${API}/v1/projects/${PROJECT_ID}/services/deployment")"
+            service_id="$(echo "${created}" | jq -r '.data.id')"
+            service_type="deployment"
+          fi
+
+          if [ "${service_type}" != "deployment" ]; then
+            echo "Service '${SERVICE_NAME}' exists but is not a deployment service. Update NF_SERVICE_NAME or delete/recreate as deployment." >&2
+            exit 1
+          fi
+
+          echo "service_id=${service_id}" >> "${GITHUB_OUTPUT}"
+
       - name: Deploy to Northflank
         if: github.event_name != 'pull_request'
         uses: northflank/deploy-to-northflank@v1
         with:
           northflank-api-key: ${{ secrets.NF_TOKEN }}
-          project-id: "test"
-          service-id: "plain-night"
+          project-id: ${{ env.NF_PROJECT_ID }}
+          service-id: ${{ steps.ensure-service.outputs.service_id }}
           image-path: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
-          credentials-id: "github"
+          credentials-id: ${{ env.NF_CREDENTIALS_ID }}

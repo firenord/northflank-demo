@@ -73,5 +73,12 @@
     "autorun": false,
     "concurrencyPolicy": "allow"
   },
+  "gitops": {
+    "repoUrl": "https://github.com/firenord/northflank-demo",
+    "vcsService": "github",
+    "accountLogin": "firenord",
+    "branch": "main",
+    "filePath": "/northflank.json"
+  },
   "$schema": "https://api.northflank.com/v1/schemas/template"
 }
